@@ -8,6 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Cria uma lista com o conteudo da localStorange
     const  tasks = JSON.parse(localStorage.getItem('Tasks')) || []
 
+    // Atualiza as tarefas na localStorage
+    function updateTasks(){
+        localStorage.setItem('Tasks', JSON.stringify(tasks))
+    }
+
     // cria no HTML o iten na lista de tarefas
     function createElementTask(task){
         const li = document.createElement('li')
@@ -27,6 +32,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const button = document.createElement('button')
         button.classList.add('app_button-edit')
+
+        button.onclick = () => {
+            const newDesc = prompt("Qual o novo nome da Tarefa ?")
+            if (newDesc){
+                p.textContent = newDesc
+                task.descricao = newDesc
+                updateTasks()
+            }
+        }
+
         const buttonImg = document.createElement('img')
         buttonImg.setAttribute('src','/imagens/edit.png')
         button.append(buttonImg)
@@ -53,8 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
         tasks.push(task)
         const elementTask = createElementTask(task)
         ulTasks.append(elementTask)
-        localStorage.setItem('Tasks', JSON.stringify(tasks))
-        
+        updateTasks()
+
         // limpando e escondendo o form apos a criação da task
         textArea.value = ''
         formAddTask.classList.add('hidden')
