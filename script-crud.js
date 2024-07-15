@@ -4,9 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const formAddTask = document.querySelector('.app__form-add-task')
     const textArea = document.querySelector('.app__form-textarea')
     const ulTasks = document.querySelector('.app__section-task-list')
+    const pDescTask = document.querySelector('.app__section-active-task-description')
+    const removeCompleteTask = document.querySelector('#btn-remover-concluidas')
+    const removeTask = document.querySelector('#btn-remover-todas')
 
     // Cria uma lista com o conteudo da localStorange
-    const  tasks = JSON.parse(localStorage.getItem('Tasks')) || []
+    let tasks = JSON.parse(localStorage.getItem('Tasks')) || []
+    let taskSelect = null
+    let liTaskSelect = null
 
     // Atualiza as tarefas na localStorage
     function updateTasks(){
@@ -32,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const button = document.createElement('button')
         button.classList.add('app_button-edit')
-
+        // edita a task
         button.onclick = () => {
             const newDesc = prompt("Qual o novo nome da Tarefa ?")
             if (newDesc){
@@ -49,6 +54,31 @@ document.addEventListener("DOMContentLoaded", () => {
         li.append(svg)
         li.append(p)
         li.append(button)
+
+        if (task.complete ){
+            li.classList.add('app__section-task-list-item-complete')
+            button.setAttribute('disabled', 'disabled')
+        } else {
+            li.onclick = () =>{
+                document.querySelectorAll('.app__section-task-list-item-active')
+                    .forEach(element =>{
+                        element.classList.remove('app__section-task-list-item-active')
+                    })
+    
+                if (taskSelect == task){
+                    pDescTask.textContent = ''
+                    taskSelect = null
+                    liTaskSelect = null
+                    return
+                }
+    
+                taskSelect = task
+                liTaskSelect = li
+                pDescTask.textContent = task.descricao
+                
+                li.classList.add('app__section-task-list-item-active')
+            }
+        }
 
         return li
     };
@@ -81,4 +111,27 @@ document.addEventListener("DOMContentLoaded", () => {
         ulTasks.append(elementTask)
     });
 
+    document.addEventListener('FocoFinalizado', () =>{
+        if (taskSelect && liTaskSelect){
+            liTaskSelect.classList.remove('app__section-task-list-item-active')
+            liTaskSelect.classList.add('app__section-task-list-item-complete')
+            liTaskSelect.querySelector('button').setAttribute('disabled', 'disabled')
+
+            taskSelect.complete = true
+            updateTasks()
+        }
+    });
+
+    const removeTasks = (completeOnly) => {
+        const select = completeOnly ? '.app__section-task-list-item-complete' : '.app__section-task-list-item'
+        document.querySelectorAll(select).forEach(element =>{
+            element.remove()
+        })
+
+        tasks = completeOnly ? tasks.filter(task => !task.complete) : []
+        updateTasks()
+    }
+
+    removeCompleteTask.onclick = () => removeTasks(true)
+    removeTask.onclick = () => removeTasks(false)
 });

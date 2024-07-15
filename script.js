@@ -15,12 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const music = new Audio('/sons/luna-rise-part-one.mp3');
     music.loop = true;
 
-    let tempSeg = 1500;
+    let tempSeg = 15;
     let intervaloId = null;
 
     const contextos = {
         'foco': {
-            tempo: 1500,
+            tempo: 15,
             texto: `Otimize sua produtividade,<br>
                     <strong class="app__title-strong">mergulhe no que importa.</strong>`,
             img: 'imagens/foco.png'
@@ -65,6 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const contaRegress = () => {
         if (tempSeg <= 0) {
             songBeep.play();
+            const focoAtivo = html.getAttribute('data-contexto') == 'foco'
+            if(focoAtivo){
+                const event = new CustomEvent('FocoFinalizado')
+                document.dispatchEvent(event)
+            } 
             zerar();
             alert('Tempo Finalizado !');
             return;
